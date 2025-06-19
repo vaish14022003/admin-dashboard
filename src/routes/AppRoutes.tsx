@@ -43,8 +43,18 @@ import "../App.css"
 
 
 const ProtectedRoutes = () => {
-    const token = useSelector((state: RootState) => state.auth.token);
+    // const token = useSelector((state: RootState) => state.auth.token);
+    // const dispatch = useDispatch();
+    const reduxToken = useSelector((state: RootState) => state.auth.token);
     const dispatch = useDispatch();
+    const token = reduxToken || localStorage.getItem('admin_token'); 
+
+    console.log('Redux Token:', reduxToken);
+    console.log('LocalStorage Token:', localStorage.getItem('admin_token'));
+    console.log('Effective Token:', token);
+
+
+
 
     if (!token) return <Navigate to="/login" replace />;
 

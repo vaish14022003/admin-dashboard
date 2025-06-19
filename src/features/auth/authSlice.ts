@@ -40,6 +40,14 @@ const authSlice = createSlice({
             state.token = null;
             localStorage.removeItem('admin_token');
         },
+        // loginSuccess: (state, action) => {
+        //     state.token = action.payload;
+        //   },
+        loginSuccess: (state, action: PayloadAction<string>) => {
+            state.token = action.payload;
+        }
+          
+
     },
     extraReducers: (builder) => {
         builder
@@ -58,5 +66,5 @@ const authSlice = createSlice({
     },
 });
 
-export const { logout } = authSlice.actions;
+export const { loginSuccess,logout } = authSlice.actions;
 export default authSlice.reducer;

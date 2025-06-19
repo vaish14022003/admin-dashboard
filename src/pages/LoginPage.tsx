@@ -29,17 +29,18 @@ const LoginPage = () => {
         try {
             console.log("Login request data:", formData);
 
-            const response = await axios.post('http://localhost:3000/auth/login', {
+            const response = await axios.post('http://localhost:3000/auth/admin/login', {
                 email: formData.email,
                 password: formData.password
             });
-
+            
+            localStorage.setItem('loginToken', response.data.accessToken)
             console.log("Login response data:", response.data);
 
             if (response.status === 200 || response.status === 201) {
                 setLoginSuccess(true);
                 setTimeout(() => {
-                    navigate('/dashboard');
+                    navigate('/verify-otp');
                 }, 2500);
             }
 
