@@ -69,79 +69,178 @@
 // });
 
 // export default userSlice.reducer;
+
+
+
+
+// import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+// import api from '../../services/api';
+// import type { User } from './userTypes';
+
+// interface UserState {
+//     users: User[];
+//     loading: boolean;
+//     error: string | null;
+// }
+
+// const initialState: UserState = {
+//     users: [],
+//     loading: false,
+//     error: null,
+// };
+
+// // GET USERS
+// export const fetchAllUsers = createAsyncThunk('users/fetchAll', async (_, thunkAPI) => {
+//     try {
+//         const res = await api.get('/admin/users');
+//         return res.data;
+//     } catch (err: any) {
+//         return thunkAPI.rejectWithValue(err.response?.data?.message || 'Failed to fetch users');
+//     }
+// });
+
+// // BLOCK USER
+// export const blockUserById = createAsyncThunk('users/block', async (id: string, thunkAPI) => {
+//     try {
+//         await api.patch(`/admin/users/${id}/block`);
+//         return id;
+//     } catch (err: any) {
+//         return thunkAPI.rejectWithValue(err.response?.data?.message || 'Block failed');
+//     }
+// });
+
+// // UNBLOCK USER
+// export const unblockUserById = createAsyncThunk('users/unblock', async (id: string, thunkAPI) => {
+//     try {
+//         await api.patch(`/admin/users/${id}/unblock`);
+//         return id;
+//     } catch (err: any) {
+//         return thunkAPI.rejectWithValue(err.response?.data?.message || 'Unblock failed');
+//     }
+// });
+
+// const userSlice = createSlice({
+//     name: 'users',
+//     initialState,
+//     reducers: {},
+//     extraReducers: (builder) => {
+//         builder
+//             .addCase(fetchAllUsers.pending, (state) => {
+//                 state.loading = true;
+//                 state.error = null;
+//             })
+//             .addCase(fetchAllUsers.fulfilled, (state, action) => {
+//                 state.users = action.payload;
+//                 state.loading = false;
+//             })
+//             .addCase(fetchAllUsers.rejected, (state, action) => {
+//                 state.error = action.payload as string;
+//                 state.loading = false;
+//             })
+//             .addCase(blockUserById.fulfilled, (state, action) => {
+//                 const user = state.users.find((u) => u._id === action.payload);
+//                 if (user) user.isBlocked = true;
+//             })
+//             .addCase(unblockUserById.fulfilled, (state, action) => {
+//                 const user = state.users.find((u) => u._id === action.payload);
+//                 if (user) user.isBlocked = false;
+//             });
+//     },
+// });
+
+// export default userSlice.reducer;
+
+
+
+
+
+
+
+
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../services/api';
 import type { User } from './userTypes';
 
 interface UserState {
-    users: User[];
-    loading: boolean;
-    error: string | null;
+  users: User[];
+  totalPages: number;
+  totalUsers: number;
+  loading: boolean;
+  error: string | null;
 }
 
 const initialState: UserState = {
-    users: [],
-    loading: false,
-    error: null,
+  users: [],
+  totalPages: 0,
+  totalUsers: 0,
+  loading: false,
+  error: null,
 };
 
 // GET USERS
-export const fetchAllUsers = createAsyncThunk('users/fetchAll', async (_, thunkAPI) => {
+export const fetchAllUsers = createAsyncThunk(
+  'users/fetchAll',
+  async ({ page, limit }: { page: number; limit: number }, thunkAPI) => {
     try {
-        const res = await api.get('/admin/users');
-        return res.data;
+      const res = await api.get('/user/list', {
+        params: { page, limit },
+      });
+      return res.data;
     } catch (err: any) {
-        return thunkAPI.rejectWithValue(err.response?.data?.message || 'Failed to fetch users');
+      return thunkAPI.rejectWithValue(err.response?.data?.message || 'Failed to fetch users');
     }
-});
+  }
+);
 
 // BLOCK USER
 export const blockUserById = createAsyncThunk('users/block', async (id: string, thunkAPI) => {
-    try {
-        await api.patch(`/admin/users/${id}/block`);
-        return id;
-    } catch (err: any) {
-        return thunkAPI.rejectWithValue(err.response?.data?.message || 'Block failed');
-    }
+  try {
+    await api.patch(`/user/block/${id}`);
+    return id;
+  } catch (err: any) {
+    return thunkAPI.rejectWithValue(err.response?.data?.message || 'Block failed');
+  }
 });
 
 // UNBLOCK USER
 export const unblockUserById = createAsyncThunk('users/unblock', async (id: string, thunkAPI) => {
-    try {
-        await api.patch(`/admin/users/${id}/unblock`);
-        return id;
-    } catch (err: any) {
-        return thunkAPI.rejectWithValue(err.response?.data?.message || 'Unblock failed');
-    }
+  try {
+    await api.patch(`/user/unblock/${id}`);
+    return id;
+  } catch (err: any) {
+    return thunkAPI.rejectWithValue(err.response?.data?.message || 'Unblock failed');
+  }
 });
 
 const userSlice = createSlice({
-    name: 'users',
-    initialState,
-    reducers: {},
-    extraReducers: (builder) => {
-        builder
-            .addCase(fetchAllUsers.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
-            .addCase(fetchAllUsers.fulfilled, (state, action) => {
-                state.users = action.payload;
-                state.loading = false;
-            })
-            .addCase(fetchAllUsers.rejected, (state, action) => {
-                state.error = action.payload as string;
-                state.loading = false;
-            })
-            .addCase(blockUserById.fulfilled, (state, action) => {
-                const user = state.users.find((u) => u._id === action.payload);
-                if (user) user.isBlocked = true;
-            })
-            .addCase(unblockUserById.fulfilled, (state, action) => {
-                const user = state.users.find((u) => u._id === action.payload);
-                if (user) user.isBlocked = false;
-            });
-    },
+  name: 'users',
+  initialState,
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchAllUsers.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchAllUsers.fulfilled, (state, action) => {
+        state.users = action.payload.data;
+        state.totalPages = action.payload.pagination.totalPages;
+        state.totalUsers = action.payload.pagination.totalItems;
+        state.loading = false;
+      })
+      .addCase(fetchAllUsers.rejected, (state, action) => {
+        state.error = action.payload as string;
+        state.loading = false;
+      })
+      .addCase(blockUserById.fulfilled, (state, action) => {
+        const user = state.users.find((u) => u._id === action.payload);
+        if (user) user.isBlocked = true;
+      })
+      .addCase(unblockUserById.fulfilled, (state, action) => {
+        const user = state.users.find((u) => u._id === action.payload);
+        if (user) user.isBlocked = false;
+      });
+  },
 });
 
 export default userSlice.reducer;
