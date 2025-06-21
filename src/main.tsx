@@ -1,56 +1,5 @@
 
 
-// import { ToastContainer } from 'react-toastify';
-// import 'react-toastify/dist/ReactToastify.css';
-// import AppRoutes from './routes/AppRoutes';
-
-// const App = () => {
-//   return (
-//     <>
-//       <AppRoutes />
-//       <ToastContainer />
-//     </>
-//   );
-// };
-
-// export default App;
-
-
-// import { useEffect } from 'react';
-// import { useDispatch, useSelector } from 'react-redux';
-// import { ToastContainer } from 'react-toastify';
-// import 'react-toastify/dist/ReactToastify.css';
-
-// import AppRoutes from './routes/AppRoutes';
-// import type { RootState } from './app/store';
-// import { logout } from './features/auth/authSlice';
-// import { isTokenExpired } from './utils/tokenHelper';
-
-// const App = () => {
-//   const dispatch = useDispatch();
-//   const token = useSelector((state: RootState) => state.auth.token);
-
-//   useEffect(() => {
-//     const interval = setInterval(() => {
-//       if (isTokenExpired(token)) {
-//         dispatch(logout());
-//       }
-//     }, 5000); // checks every 5 seconds
-
-//     return () => clearInterval(interval); // cleanup
-//   }, [token, dispatch]);
-
-//   return (
-//     <>
-//       <AppRoutes />
-//       <ToastContainer />
-//     </>
-//   );
-// };
-
-// export default App;
-
-
 // src/main.tsx
 
 
@@ -76,6 +25,11 @@ const AuthWatcher = () => {
     const interval = setInterval(() => {
       if (token && isTokenExpired(token)) {
         dispatch(logout());
+
+        import('react-toastify').then(({ toast }) =>
+          toast.info('Session expired. Please login again.')
+        );
+
       }
     }, 5000);
 
@@ -85,17 +39,7 @@ const AuthWatcher = () => {
   return null;
 };
 
-// const App = () => {
-//   return (
-//     <Provider store={store}>
-//       <AppRoutes />
-//       {/* <AuthWatcher />
-//       <ToastContainer /> */}
-//     </Provider>
-//   );
-// };
 
-// export default App;
 
 
 

@@ -37,6 +37,8 @@ const LoginPage = () => {
             localStorage.setItem('loginToken', response.data.accessToken)
             console.log("Login response data:", response.data);
 
+            
+
             if (response.status === 200 || response.status === 201) {
                 setLoginSuccess(true);
                 setTimeout(() => {
@@ -118,6 +120,17 @@ const LoginPage = () => {
                                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-300 focus:outline-none"
                                 />
                             </div>
+
+
+                            <div className="text-right">
+                                <span
+                                    onClick={() => navigate('/forgot-password')}
+                                    className="text-blue-600 text-sm hover:underline cursor-pointer"
+                                >
+                                    Forgot Password?
+                                </span>
+                            </div>
+
 
                             <button
                                 type="submit"

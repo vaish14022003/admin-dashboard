@@ -112,6 +112,16 @@ const Sidebar = () => {
                     Users
                 </Link>
 
+
+                <Link
+                    to="/managers"
+                    className={`flex items-center gap-3 p-2 rounded-md ${isActive('/managers') ? 'bg-blue-500 text-white' : 'text-blue-800 hover:bg-blue-200'
+                        }`}
+                >
+                    <FaUsers />
+                    Managers
+                </Link>
+
                 <button
                     onClick={handleLogout}
                     className="flex items-center gap-3 p-2 rounded-md text-red-600 hover:bg-red-100 w-full"

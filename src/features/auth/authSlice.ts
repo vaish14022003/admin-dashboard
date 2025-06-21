@@ -1,10 +1,11 @@
-//import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
-
+//import { logoutAdmin } from '../../services/auth';
 import axios from 'axios';
 
 interface AuthState {
+    user: any;
     token: string | null;
     loading: boolean;
     error: string | null;
@@ -31,6 +32,16 @@ export const loginAdmin = createAsyncThunk(
         }
     }
 );
+
+// export const logout = createAsyncThunk('auth/logout', async (_, thunkAPI) => {
+//     try {
+//         const res = await logoutAdmin();
+//         localStorage.removeItem('loginToken');
+//         return res;
+//     } catch (err: any) {
+//         return thunkAPI.rejectWithValue(err.response?.data?.message || 'Logout failed');
+//     }
+// });
 
 const authSlice = createSlice({
     name: 'auth',
@@ -62,7 +73,12 @@ const authSlice = createSlice({
             .addCase(loginAdmin.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string;
-            });
+            })
+            // .addCase(logout.fulfilled, (state) => {
+            //     state.user = null;
+            //     state.token = null;
+            // })
+    
     },
 });
 

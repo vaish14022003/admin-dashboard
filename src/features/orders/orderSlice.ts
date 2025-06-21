@@ -1,83 +1,4 @@
-// import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-// import api from '../../services/api';
 
-// export interface Order {
-//     _id: string;
-//     user: { name: string; email: string };
-//     items: string[];
-//     totalAmount: number;
-//     createdAt: string;
-// }
-
-// interface OrderState {
-//     allOrders: Order[];
-//     userOrders: Order[];
-//     loading: boolean;
-//     error: string | null;
-// }
-
-// const initialState: OrderState = {
-//     allOrders: [],
-//     userOrders: [],
-//     loading: false,
-//     error: null,
-// };
-
-// export const fetchAllOrders = createAsyncThunk('orders/fetchAll', async (_, thunkAPI) => {
-//     try {
-//         const res = await api.get('/orders');
-//         return res.data;
-//     } catch (err: any) {
-//         return thunkAPI.rejectWithValue(err.response?.data?.message || 'Failed to fetch orders');
-//     }
-// });
-
-// export const fetchOrdersByUser = createAsyncThunk(
-//     'orders/fetchByUser',
-//     async (userId: string, thunkAPI) => {
-//         try {
-//             const res = await api.get(`/orders/user/${userId}`);
-//             return res.data;
-//         } catch (err: any) {
-//             return thunkAPI.rejectWithValue(err.response?.data?.message || 'Failed to fetch user orders');
-//         }
-//     }
-// );
-
-// const orderSlice = createSlice({
-//     name: 'orders',
-//     initialState,
-//     reducers: {
-//         clearUserOrders: (state) => {
-//             state.userOrders = [];
-//         },
-//     },
-//     extraReducers: (builder) => {
-//         builder
-//             .addCase(fetchAllOrders.pending, (state) => {
-//                 state.loading = true;
-//             })
-//             .addCase(fetchAllOrders.fulfilled, (state, action: PayloadAction<Order[]>) => {
-//                 state.allOrders = action.payload;
-//                 state.loading = false;
-//             })
-//             .addCase(fetchOrdersByUser.fulfilled, (state, action: PayloadAction<Order[]>) => {
-//                 state.userOrders = action.payload;
-//                 state.loading = false;
-//             })
-//             .addCase(fetchAllOrders.rejected, (state, action) => {
-//                 state.error = action.payload as string;
-//                 state.loading = false;
-//             })
-//             .addCase(fetchOrdersByUser.rejected, (state, action) => {
-//                 state.error = action.payload as string;
-//                 state.loading = false;
-//             });
-//     },
-// });
-
-// export const { clearUserOrders } = orderSlice.actions;
-// export default orderSlice.reducer;
 
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../services/api';
@@ -85,24 +6,59 @@ import type { Order } from './orderTypes';
 
 interface OrderState {
     orders: Order[];
+    totalOrders: number;
+    currentPage: number;
+    totalPages: number;
     loading: boolean;
     error: string | null;
 }
 
 const initialState: OrderState = {
     orders: [],
+    totalOrders: 0,
+    currentPage: 1,
+    totalPages: 1,
     loading: false,
     error: null,
 };
 
-export const fetchAllOrders = createAsyncThunk(
-    'orders/fetchAll',
-    async (_, thunkAPI) => {
+// ✅ Fetch orders by user ID with pagination
+export const fetchOrdersByUser = createAsyncThunk(
+    'orders/fetchByUser',
+    async (
+        { userId, page, limit }: { userId: string; page: number; limit: number },
+        thunkAPI
+    ) => {
         try {
-            const res = await api.get('/admin/orders');
-            return res.data;
+            const res = await api.get(`/order/user/${userId}?page=${page}&limit=${limit}`);
+            return {
+                orders: res.data.orders,
+                currentPage: res.data.currentPage,
+                totalPages: res.data.totalPages,
+            };
         } catch (err: any) {
-            return thunkAPI.rejectWithValue(err.response?.data?.message || 'Order fetch failed');
+            return thunkAPI.rejectWithValue(
+                err.response?.data?.message || 'Failed to fetch user orders'
+            );
+        }
+    }
+);
+
+// ✅ Fetch total orders with filters
+export const fetchTotalOrders = createAsyncThunk(
+    'orders/fetchTotalOrders',
+    async (
+        params: { period: 'week' | 'month' | 'year'; status?: string; paymentStatus?: string },
+        thunkAPI
+    ) => {
+        try {
+            const query = new URLSearchParams(params as any).toString();
+            const res = await api.get(`/order/total?${query}`);
+            return res.data.totalOrders ?? 0;
+        } catch (err: any) {
+            return thunkAPI.rejectWithValue(
+                err.response?.data?.message || 'Failed to fetch total orders'
+            );
         }
     }
 );
@@ -113,20 +69,139 @@ const orderSlice = createSlice({
     reducers: {},
     extraReducers: (builder) => {
         builder
-            .addCase(fetchAllOrders.pending, (state) => {
+            // Fetch Orders by User
+            .addCase(fetchOrdersByUser.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(fetchAllOrders.fulfilled, (state, action) => {
-                state.orders = action.payload;
+            .addCase(fetchOrdersByUser.fulfilled, (state, action) => {
+                state.orders = action.payload.orders;
+                state.currentPage = action.payload.currentPage;
+                state.totalPages = action.payload.totalPages;
                 state.loading = false;
             })
-            .addCase(fetchAllOrders.rejected, (state, action) => {
-                state.error = action.payload as string;
+            .addCase(fetchOrdersByUser.rejected, (state, action) => {
                 state.loading = false;
+                state.error = action.payload as string;
+            })
+
+            // Fetch Total Orders
+            .addCase(fetchTotalOrders.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchTotalOrders.fulfilled, (state, action) => {
+                state.totalOrders = action.payload;
+                state.loading = false;
+            })
+            .addCase(fetchTotalOrders.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
             });
     },
 });
 
 export default orderSlice.reducer;
 
+// import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+// import api from '../../services/api';
+// import type { Order } from './orderTypes';
+
+// interface OrderState {
+//     orders: Order[];
+//     totalOrders: number;
+//     currentPage: number;
+//     totalPages: number;
+//     loading: boolean;
+//     error: string | null;
+// }
+
+// const initialState: OrderState = {
+//     orders: [],
+//     totalOrders: 0,
+//     currentPage: 1,
+//     totalPages: 1,
+//     loading: false,
+//     error: null,
+// };
+
+// // ✅ Fetch orders by user ID with pagination
+// export const fetchOrdersByUser = createAsyncThunk(
+//     'orders/fetchByUser',
+//     async (
+//         { userId, page, limit }: { userId: string; page: number; limit: number },
+//         thunkAPI
+//     ) => {
+//         try {
+//             const response = await api.get(`/order/user/${userId}`, {
+//                 params: { page, limit },
+//             });
+
+//             return {
+//                 orders: response.data.orders,
+//                 currentPage: response.data.currentPage,
+//                 totalPages: response.data.totalPages,
+//             };
+//         } catch (err: any) {
+//             return thunkAPI.rejectWithValue(
+//                 err.response?.data?.message || 'Failed to fetch user orders'
+//             );
+//         }
+//     }
+// );
+
+// // ✅ Fetch total orders with filters
+// export const fetchTotalOrders = createAsyncThunk(
+//     'orders/fetchTotalOrders',
+//     async (
+//         params: { period: 'week' | 'month' | 'year'; status?: string; paymentStatus?: string },
+//         thunkAPI
+//     ) => {
+//         try {
+//             const query = new URLSearchParams(params as any).toString();
+//             const res = await api.get(`/order/total?${query}`);
+//             return res.data.totalOrders ?? 0;
+//         } catch (err: any) {
+//             return thunkAPI.rejectWithValue(
+//                 err.response?.data?.message || 'Failed to fetch total orders'
+//             );
+//         }
+//     }
+// );
+
+// const orderSlice = createSlice({
+//     name: 'orders',
+//     initialState,
+//     reducers: {},
+//     extraReducers: (builder) => {
+//         builder
+//             .addCase(fetchOrdersByUser.pending, (state) => {
+//                 state.loading = true;
+//                 state.error = null;
+//             })
+//             .addCase(fetchOrdersByUser.fulfilled, (state, action) => {
+//                 state.orders = action.payload.orders;
+//                 state.currentPage = action.payload.currentPage;
+//                 state.totalPages = action.payload.totalPages;
+//                 state.loading = false;
+//             })
+//             .addCase(fetchOrdersByUser.rejected, (state, action) => {
+//                 state.loading = false;
+//                 state.error = action.payload as string;
+//             })
+//             .addCase(fetchTotalOrders.pending, (state) => {
+//                 state.loading = true;
+//                 state.error = null;
+//             })
+//             .addCase(fetchTotalOrders.fulfilled, (state, action) => {
+//                 state.totalOrders = action.payload;
+//                 state.loading = false;
+//             })
+//             .addCase(fetchTotalOrders.rejected, (state, action) => {
+//                 state.loading = false;
+//                 state.error = action.payload as string;
+//             });
+//     },
+// });
+
+// export default orderSlice.reducer;

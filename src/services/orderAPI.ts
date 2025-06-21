@@ -1,21 +1,35 @@
+// import api from './api';
+
+
+// // ✅ NEW
+// export const getTotalOrders = async () => {
+//     const response = await api.get('/admin/orders/total');
+//     return response.data;
+// };
+
+// // ✅ NEW
+// export const getOrdersByUserId = async (userId: string) => {
+//     const response = await api.get(`/admin/orders/user/${userId}`);
+//     return response.data;
+// };
 import api from './api';
 
-export const fetchAllOrders = async () => {
-    const response = await api.get('/admin/orders');
+// ✅ Get total orders based on required query param
+export const getTotalOrders = async (
+    period: 'month' | 'year' | 'week',
+    status?: string,
+    paymentStatus?: string
+) => {
+    const params = new URLSearchParams({ period });
+    if (status) params.append('status', status);
+    if (paymentStatus) params.append('paymentStatus', paymentStatus);
+
+    const response = await api.get(`/order/total?${params.toString()}`);
     return response.data;
 };
 
-export const fetchOrdersByUser = async (userId: string) => {
-    const response = await api.get(`/admin/orders/user/${userId}`);
-    return response.data;
-};
-
-export const fetchOrdersByDate = async (start: string, end: string) => {
-    const response = await api.get(`/admin/orders?start=${start}&end=${end}`);
-    return response.data;
-};
-
-export const getOrderStats = async () => {
-    const response = await api.get('/admin/orders/stats');
+// ✅ Get orders by user ID
+export const getOrdersByUserId = async (userId: string) => {
+    const response = await api.get(`/order/user/${userId}`);
     return response.data;
 };
