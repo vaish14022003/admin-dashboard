@@ -1,18 +1,11 @@
-// import axios from "axios";
 
-// const api = axios.create({
-//     baseURL: import.meta.env.VITE_API_BASE_URL,
-//     withCredentials: true, // If using cookies or sessions
-// });
 
-// export default api;
 import axios from 'axios';
+import { refreshAdminToken } from './authAPI';
 
 const api = axios.create({
     baseURL: 'http://localhost:3000',
-    headers: {
-        'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
 });
 
 api.interceptors.request.use((config) => {
@@ -22,5 +15,24 @@ api.interceptors.request.use((config) => {
     }
     return config;
 });
+
+api.interceptors.response.use(
+    res => res,
+    async (error) => {
+        const originalRequest = error.config;
+        if (error.response?.status === 401 && !originalRequest._retry) {
+            originalRequest._retry = true;
+            try {
+                const newToken = await refreshAdminToken();
+                originalRequest.headers.Authorization = `Bearer ${newToken}`;
+                return api(originalRequest);
+            } catch (err) {
+                localStorage.clear();
+                window.location.href = '/login';
+            }
+        }
+        return Promise.reject(error);
+    }
+);
 
 export default api;

@@ -77,7 +77,9 @@ const AppRoutes = () => (
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+        {/* <Route path="/reset-password/:token" element={<ResetPasswordPage />} /> */}
+        <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
+
         <Route path="/verify-otp" element={<VerifyOtpPage />} />
 
         <Route element={<ProtectedRoutes />}>
