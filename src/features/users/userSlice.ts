@@ -171,7 +171,7 @@ interface UserState {
 
 const initialState: UserState = {
   users: [],
-  totalPages: 0,
+  totalPages: 1,
   totalUsers: 0,
   loading: false,
   error: null,

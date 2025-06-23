@@ -339,108 +339,306 @@
 
 
 
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import type { PayloadAction } from '@reduxjs/toolkit';
-import * as managerAPI from '../../services/managerAPI';
+// import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+// import type { PayloadAction } from '@reduxjs/toolkit';
+// import * as managerAPI from '../../services/managerAPI';
 
-export interface Manager {
+
+// export interface Manager {
+//   isBlocked: any;
+//   _id: string;
+//   name: string;
+//   email: string;
+//   isValidated: boolean;
+//   restaurants?: any[];
+// }
+
+// interface ManagerState {
+//   managers: Manager[];
+//   loading: boolean;
+//   error: string | null;
+// }
+
+// const initialState: ManagerState = {
+//   managers: [],
+//   loading: false,
+//   error: null,
+// };
+
+// export const fetchManagers = createAsyncThunk(
+//   'managers/fetchAll',
+//   async (_, thunkAPI) => {
+//     try {
+//       const response = await managerAPI.fetchManagers();
+//       return response.data.data;
+//     } catch (err: any) {
+//       return thunkAPI.rejectWithValue(
+//         err.response?.data?.message || 'Failed to fetch managers'
+//       );
+//     }
+//   }
+// );
+// export const validateManager = createAsyncThunk(
+//     'managers/validate',
+//     async ({ managerId, restaurantId }: { managerId: string; restaurantId: string }, thunkAPI) => {
+//       const response = await api.patch(`/managers/Validate?managerId=${managerId}`);
+//       return response.data;
+//     }
+//   );
+  
+//   export const invalidateManager = createAsyncThunk(
+//     'managers/invalidate',
+//     async ({ managerId, restaurantId }: { managerId: string; restaurantId: string }, thunkAPI) => {
+//       const response = await api.patch(`/managers/Invalidate?managerId=${managerId}`);
+//       return response.data;
+//     }
+//   );
+  
+//   export const blockManager = createAsyncThunk(
+//     'managers/block',
+//     async ({ managerId, restaurantId }: { managerId: string; restaurantId: string }, thunkAPI) => {
+//       const response = await api.patch(`/admin/managers/${managerId}/block?restaurantId=${restaurantId}`);
+//       return response.data;
+//     }
+//   );
+  
+//   export const deleteManager = createAsyncThunk(
+//     'managers/delete',
+//     async ({ managerId, restaurantId }: { managerId: string; restaurantId: string }, thunkAPI) => {
+//       const response = await api.delete(`/admin/managers/${managerId}?restaurantId=${restaurantId}`);
+//       return { managerId };
+//     }
+//   );
+  
+
+// const managerSlice = createSlice({
+//   name: 'managers',
+//   initialState,
+//   reducers: {},
+//   extraReducers: (builder) => {
+//     builder
+//       .addCase(fetchManagers.pending, (state) => {
+//         state.loading = true;
+//       })
+//       .addCase(fetchManagers.fulfilled, (state, action: PayloadAction<Manager[]>) => {
+//         state.managers = action.payload;
+//         state.loading = false;
+//       })
+//       .addCase(fetchManagers.rejected, (state, action) => {
+//         state.loading = false;
+//         state.error = action.payload as string;
+//       })
+//       .addCase(validateManager.fulfilled, (state, action: PayloadAction<Manager>) => {
+//         const index = state.managers.findIndex((m) => m._id === action.payload._id);
+//         if (index !== -1) state.managers[index] = action.payload;
+//       })
+//       .addCase(invalidateManager.fulfilled, (state, action: PayloadAction<Manager>) => {
+//         const index = state.managers.findIndex((m) => m._id === action.payload._id);
+//         if (index !== -1) state.managers[index] = action.payload;
+//       })
+//       .addCase(deleteManager.fulfilled, (state, action: PayloadAction<string>) => {
+//         state.managers = state.managers.filter((m) => m._id !== action.payload);
+//       });
+//   },
+// });
+
+// export default managerSlice.reducer;
+
+
+
+
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import api from "../../services/api";
+
+// Interfaces for type safety
+interface Manager {
   isBlocked: any;
-  _id: string;
-  name: string;
-  email: string;
   isValidated: boolean;
-  restaurants?: any[];
+  _id: string;
+  email: string;
+  restaurantId?: string; // Added to support blockRestaurant action
 }
 
-interface ManagerState {
+interface ManagersState {
   managers: Manager[];
+  total: number;
+  currentPage: number;
+  totalPages: number; // Added for complete pagination
   loading: boolean;
   error: string | null;
+  actionStatus: string | null;
 }
 
-const initialState: ManagerState = {
+interface ManagersListResponse {
+  data: Manager[];
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+    limit: number;
+  };
+}
+
+interface GetManagersParams {
+  page?: number;
+  limit?: number;
+}
+
+interface ActionParams {
+  restaurantId?: string;
+  managerId?: string;
+}
+
+// Initial state
+const initialState: ManagersState = {
   managers: [],
+  total: 0,
+  currentPage: 1,
+  totalPages: 1,
   loading: false,
   error: null,
+  actionStatus: null,
 };
 
-export const fetchManagers = createAsyncThunk(
-  'managers/fetchAll',
-  async (_, thunkAPI) => {
+// Async thunk for getting paginated list of managers
+export const getManagersList = createAsyncThunk<
+  ManagersListResponse,
+  GetManagersParams,
+  { rejectValue: string }
+>(
+  "manager/getManagersList",
+  async ({ page = 1, limit = 10 }, { rejectWithValue }) => {
     try {
-      const response = await managerAPI.fetchManagers();
-      return response.data.data;
-    } catch (err: any) {
-      return thunkAPI.rejectWithValue(
-        err.response?.data?.message || 'Failed to fetch managers'
-      );
+      const response = await api.get<ManagersListResponse>("/manager/list", {
+        params: { page, limit },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
   }
 );
-export const validateManager = createAsyncThunk(
-    'managers/validate',
-    async ({ managerId, restaurantId }: { managerId: string; restaurantId: string }, thunkAPI) => {
-      const response = await api.patch(`/admin/managers/${managerId}/validate?restaurantId=${restaurantId}`);
-      return response.data;
-    }
-  );
-  
-  export const invalidateManager = createAsyncThunk(
-    'managers/invalidate',
-    async ({ managerId, restaurantId }: { managerId: string; restaurantId: string }, thunkAPI) => {
-      const response = await api.patch(`/admin/managers/${managerId}/invalidate?restaurantId=${restaurantId}`);
-      return response.data;
-    }
-  );
-  
-  export const blockManager = createAsyncThunk(
-    'managers/block',
-    async ({ managerId, restaurantId }: { managerId: string; restaurantId: string }, thunkAPI) => {
-      const response = await api.patch(`/admin/managers/${managerId}/block?restaurantId=${restaurantId}`);
-      return response.data;
-    }
-  );
-  
-  export const deleteManager = createAsyncThunk(
-    'managers/delete',
-    async ({ managerId, restaurantId }: { managerId: string; restaurantId: string }, thunkAPI) => {
-      const response = await api.delete(`/admin/managers/${managerId}?restaurantId=${restaurantId}`);
-      return { managerId };
-    }
-  );
-  
+
+// Async thunk for blocking a restaurant
+export const blockRestaurant = createAsyncThunk<
+  void,
+  ActionParams,
+  { rejectValue: string }
+>("manager/blockRestaurant", async ({ managerId }, { rejectWithValue }) => {
+  try {
+    await api.patch(`/manager/block?managerId=${managerId}`);
+  } catch (error: any) {
+    return rejectWithValue(error.response?.data?.message || error.message);
+  }
+});
+
+// Async thunk for validating a manager
+export const validateManager = createAsyncThunk<
+  void,
+  ActionParams,
+  { rejectValue: string }
+>("manager/validateManager", async ({ managerId }, { rejectWithValue }) => {
+  try {
+    await api.patch(`/manager/Validate?managerId=${managerId}`);
+  } catch (error: any) {
+    return rejectWithValue(error.response?.data?.message || error.message);
+  }
+});
+
+// Async thunk for invalidating a manager
+export const invalidateManager = createAsyncThunk<
+  void,
+  ActionParams,
+  { rejectValue: string }
+>("manager/invalidateManager", async ({ managerId }, { rejectWithValue }) => {
+  try {
+    await api.patch(`/manager/Invalidate?managerId=${managerId}`);
+  } catch (error: any) {
+    return rejectWithValue(error.response?.data?.message || error.message);
+  }
+});
 
 const managerSlice = createSlice({
-  name: 'managers',
+  name: "manager",
   initialState,
-  reducers: {},
+  reducers: {
+    clearError: (state) => {
+      state.error = null;
+    },
+    clearActionStatus: (state) => {
+      state.actionStatus = null;
+    },
+  },
   extraReducers: (builder) => {
+    // Get Managers List
     builder
-      .addCase(fetchManagers.pending, (state) => {
+      .addCase(getManagersList.pending, (state) => {
         state.loading = true;
+        state.error = null;
       })
-      .addCase(fetchManagers.fulfilled, (state, action: PayloadAction<Manager[]>) => {
-        state.managers = action.payload;
+      .addCase(getManagersList.fulfilled, (state, action) => {
         state.loading = false;
+        state.managers = action.payload.data || [];
+        state.total = action.payload.pagination.totalItems || 0;
+        state.currentPage = action.payload.pagination.currentPage || 1;
+        state.totalPages = action.payload.pagination.totalPages || 1;
       })
-      .addCase(fetchManagers.rejected, (state, action) => {
+      .addCase(getManagersList.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string;
+        state.error = action.payload || "Failed to fetch managers";
+      });
+
+    // Block Restaurant
+    builder
+      .addCase(blockRestaurant.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.actionStatus = null;
       })
-      .addCase(validateManager.fulfilled, (state, action: PayloadAction<Manager>) => {
-        const index = state.managers.findIndex((m) => m._id === action.payload._id);
-        if (index !== -1) state.managers[index] = action.payload;
+      .addCase(blockRestaurant.fulfilled, (state) => {
+        state.loading = false;
+        state.actionStatus = "Restaurant blocked successfully";
       })
-      .addCase(invalidateManager.fulfilled, (state, action: PayloadAction<Manager>) => {
-        const index = state.managers.findIndex((m) => m._id === action.payload._id);
-        if (index !== -1) state.managers[index] = action.payload;
+      .addCase(blockRestaurant.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to block restaurant";
+      });
+
+    // Validate Manager
+    builder
+      .addCase(validateManager.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.actionStatus = null;
       })
-      .addCase(deleteManager.fulfilled, (state, action: PayloadAction<string>) => {
-        state.managers = state.managers.filter((m) => m._id !== action.payload);
+      .addCase(validateManager.fulfilled, (state) => {
+        state.loading = false;
+        state.actionStatus = "Manager validated successfully";
+      })
+      .addCase(validateManager.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to validate manager";
+      });
+
+    // Invalidate Manager
+    builder
+      .addCase(invalidateManager.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.actionStatus = null;
+      })
+      .addCase(invalidateManager.fulfilled, (state) => {
+        state.loading = false;
+        state.actionStatus = "Manager invalidated successfully";
+      })
+      .addCase(invalidateManager.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to invalidate manager";
       });
   },
 });
 
+export const { clearError, clearActionStatus } = managerSlice.actions;
 export default managerSlice.reducer;
 
 

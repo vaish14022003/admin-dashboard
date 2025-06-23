@@ -61,7 +61,7 @@
 import api from './api';
 
 export const fetchManagers = async () =>
-  await api.get('/manager/list?page=1&limit=100');
+  await api.get('/manager/list?page=1&limit=10');
 
 export const validateManager = async (managerId: string, restaurantId: string) =>
   await api.patch(`/manager/Validate?managerId=${managerId}&restaurantId=${restaurantId}`);
@@ -72,7 +72,5 @@ export const invalidateManager = async (managerId: string, restaurantId: string)
 export const blockManager = async (managerId: string, restaurantId: string) =>
   await api.patch(`/manager/Block?managerId=${managerId}&restaurantId=${restaurantId}`);
 
-export const deleteManager = async (managerId: string, restaurantId: string) =>
-  await api.delete(`/manager?managerId=${managerId}&restaurantId=${restaurantId}`);
 
 

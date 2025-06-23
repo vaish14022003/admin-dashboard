@@ -83,86 +83,264 @@
 // export default ManagersPage;
 
 // src/pages/ManagersPage.tsx
-import { useEffect } from "react";
+
+// import { useEffect } from "react";
+// import { useDispatch, useSelector } from "react-redux";
+// import type { RootState, AppDispatch } from "../app/store";
+// import {
+//   fetchManagers,
+//   validateManager,
+//   invalidateManager,
+//   blockManager,
+//   deleteManager,
+// } from "../features/managers/managerSlice";
+// import Sidebar from "../components/Sidebar";
+// import Header from "../components/Header";
+// import Spinner from "../components/Spinner";
+// import { showSuccess, showError } from "../utils/toastHelper";
+
+// const ManagersPage = () => {
+//   const dispatch = useDispatch<AppDispatch>();
+//   const { managers, loading } = useSelector(
+//     (state: RootState) => state.managers
+//   );
+
+//   useEffect(() => {
+//     dispatch(fetchManagers());
+//   }, [dispatch]);
+
+//   const handleValidateToggle = async (mgr: any) => {
+//     // console.log(mgr);
+//     // if (!mgr.restaurants || mgr.restaurants.length === 0) {
+//     //   return showError("No restaurants assigned to this manager.");
+//     // }
+
+//     // const restaurantId = mgr.restaurants[0]._id;
+
+//     // try {
+//     //   if (mgr.isValidated) {
+//     //     await dispatch(
+//     //       invalidateManager({ managerId: mgr._id, restaurantId })
+//     //     ).unwrap();
+//     //     showSuccess("Manager invalidated");
+//     //   } else {
+//     //     await dispatch(
+//     //       validateManager({ managerId: mgr._id, restaurantId })
+//     //     ).unwrap();
+//     //     showSuccess("Manager validated");
+//     //   }
+//     // } catch (err: any) {
+//     //   showError(err);
+//     // }
+//     console.log(mgr._id);
+//     dispatch(
+//       validateManager({
+//         managerId: mgr._id,
+//         restaurantId: "",
+//       })
+//     );
+//   };
+
+//   const handleBlockToggle = async (mgr: any) => {
+//     if (!mgr.restaurants || mgr.restaurants.length === 0) {
+//       return showError("No restaurants assigned to this manager.");
+//     }
+
+//     const restaurantId = mgr.restaurants[0]._id;
+
+//     try {
+//       await dispatch(
+//         blockManager({ managerId: mgr._id, restaurantId })
+//       ).unwrap();
+//       showSuccess(mgr.isBlocked ? "Manager unblocked" : "Manager blocked");
+//     } catch (err: any) {
+//       showError(err);
+//     }
+//   };
+
+//   const handleDelete = async (mgr: any) => {
+//     if (!mgr.restaurants || mgr.restaurants.length === 0) {
+//       return showError("No restaurants assigned to this manager.");
+//     }
+
+//     const restaurantId = mgr.restaurants[0]._id;
+
+//     try {
+//       await dispatch(
+//         deleteManager({ managerId: mgr._id, restaurantId })
+//       ).unwrap();
+//       showSuccess("Manager deleted");
+//     } catch (err: any) {
+//       showError(err);
+//     }
+//   };
+
+//   return (
+//     <div className="flex">
+//       <Sidebar />
+//       <div className="flex flex-col flex-grow ml-64">
+//         <Header />
+//         <main className="p-6 bg-gray-50 min-h-screen">
+//           <h2 className="text-2xl font-bold text-blue-800 mb-6">Managers</h2>
+//           {loading ? (
+//             <Spinner />
+//           ) : (
+//             <table className="w-full bg-white shadow-md rounded-xl overflow-hidden">
+//               <thead className="bg-blue-100 text-blue-800">
+//                 <tr>
+//                   <th>Name</th>
+//                   <th>Email</th>
+//                   <th>Validated</th>
+//                   <th>Blocked</th>
+//                   <th>Restaurants</th>
+//                   <th>Actions</th>
+//                 </tr>
+//               </thead>
+//               <tbody>
+//                 {managers.map((mgr) => (
+//                   <tr key={mgr._id} className="border-t">
+//                     <td className="px-4 py-3">{mgr.name}</td>
+//                     <td className="px-4 py-3">{mgr.email}</td>
+//                     <td className="px-4 py-3">
+//                       {mgr.isValidated ? "Yes" : "No"}
+//                     </td>
+//                     <td className="px-4 py-3">
+//                       {mgr.isBlocked ? "Yes" : "No"}
+//                     </td>
+//                     <td className="px-4 py-3">
+//                       {mgr.restaurants?.length || 0}
+//                     </td>
+//                     <td className="px-4 py-3 flex gap-2">
+//                       <button
+//                         onClick={() => handleValidateToggle(mgr)}
+//                         className={`px-3 py-1 rounded-md font-semibold ${
+//                           mgr.isValidated
+//                             ? "bg-yellow-500 hover:bg-yellow-600"
+//                             : "bg-green-500 hover:bg-green-600"
+//                         } text-white`}
+//                       >
+//                         {mgr.isValidated ? "Invalidate" : "Validate"}
+//                       </button>
+
+//                       <button
+//                         onClick={() => handleBlockToggle(mgr)}
+//                         className={`px-3 py-1 rounded-md font-semibold ${
+//                           mgr.isBlocked
+//                             ? "bg-green-500 hover:bg-green-600"
+//                             : "bg-red-500 hover:bg-red-600"
+//                         } text-white`}
+//                       >
+//                         {mgr.isBlocked ? "Unblock" : "Block"}
+//                       </button>
+
+//                       <button
+//                         onClick={() => handleDelete(mgr)}
+//                         className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md font-semibold"
+//                       >
+//                         Delete
+//                       </button>
+//                     </td>
+//                   </tr>
+//                 ))}
+//               </tbody>
+//             </table>
+//           )}
+//         </main>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default ManagersPage;
+
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState, AppDispatch } from "../app/store";
 import {
-  fetchManagers,
+  getManagersList,
   validateManager,
   invalidateManager,
-  blockManager,
-  deleteManager,
+  blockRestaurant,
+  clearError,
+  clearActionStatus,
 } from "../features/managers/managerSlice";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 import Spinner from "../components/Spinner";
 import { showSuccess, showError } from "../utils/toastHelper";
+import AdminChart from "../components/managerCharts";
+
+// Define Manager interface to match the slice
+interface Manager {
+  _id: string;
+  email: string;
+  restaurantId?: string;
+}
 
 const ManagersPage = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { managers, loading } = useSelector(
-    (state: RootState) => state.managers
-  );
+  const { managers, loading, error, actionStatus, currentPage, totalPages } =
+    useSelector((state: RootState) => state.manager);
+  const [page, setPage] = useState(1); // Local state for pagination
+  const limit = 10;
 
   useEffect(() => {
-    dispatch(fetchManagers());
-  }, [dispatch]);
+    console.log("Admin token:", localStorage.getItem("admin_token"));
+    console.log(`Fetching managers for page ${page}...`);
+    dispatch(getManagersList({ page, limit }))
+      .unwrap()
+      .then((response) => {
+        console.log("Managers fetched:", response.data);
+      })
+      .catch((err) => {
+        console.error("Fetch managers error:", err);
+      });
+  }, [dispatch, page]); // Only refetch when page changes
 
-  const handleValidateToggle = async (mgr: any) => {
-    if (!mgr.restaurants || mgr.restaurants.length === 0) {
-      return showError("No restaurants assigned to this manager.");
+  // Handle action status and errors in a separate useEffect
+  useEffect(() => {
+    if (actionStatus) {
+      showSuccess(actionStatus);
+      dispatch(clearActionStatus());
     }
+    if (error) {
+      showError(error);
+      dispatch(clearError());
+    }
+  }, [actionStatus, error, dispatch]);
 
-    const restaurantId = mgr.restaurants[0]._id;
-
+  const handleValidate = async (mgr: Manager) => {
     try {
-      if (mgr.isValidated) {
-        await dispatch(
-          invalidateManager({ managerId: mgr._id, restaurantId })
-        ).unwrap();
-        showSuccess("Manager invalidated");
-      } else {
-        await dispatch(
-          validateManager({ managerId: mgr._id, restaurantId })
-        ).unwrap();
-        showSuccess("Manager validated");
-      }
+      await dispatch(validateManager({ managerId: mgr._id })).unwrap();
+
+      console.log(`Validated manager: ${mgr._id}`);
     } catch (err: any) {
-      showError(err);
+      console.error("Validate manager error:", err);
     }
   };
 
-  const handleBlockToggle = async (mgr: any) => {
-    if (!mgr.restaurants || mgr.restaurants.length === 0) {
-      return showError("No restaurants assigned to this manager.");
-    }
-
-    const restaurantId = mgr.restaurants[0]._id;
-
+  const handleInvalidate = async (mgr: Manager) => {
     try {
-      await dispatch(
-        blockManager({ managerId: mgr._id, restaurantId })
-      ).unwrap();
-      showSuccess(mgr.isBlocked ? "Manager unblocked" : "Manager blocked");
+      await dispatch(invalidateManager({ managerId: mgr._id })).unwrap();
+
+      console.log(`Invalidated manager: ${mgr._id}`);
     } catch (err: any) {
-      showError(err);
+      console.error("Invalidate manager error:", err);
     }
   };
 
-  const handleDelete = async (mgr: any) => {
-    if (!mgr.restaurants || mgr.restaurants.length === 0) {
-      return showError("No restaurants assigned to this manager.");
-    }
-
-    const restaurantId = mgr.restaurants[0]._id;
-
+  const handleBlock = async (mgr: Manager) => {
     try {
-      await dispatch(
-        deleteManager({ managerId: mgr._id, restaurantId })
-      ).unwrap();
-      showSuccess("Manager deleted");
+      await dispatch(blockRestaurant({ managerId: mgr._id })).unwrap();
+      console.log(`Invalidated manager: ${mgr._id}`);
     } catch (err: any) {
-      showError(err);
+      console.error("Invalidate manager error:", err);
+    }
+  };
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setPage(newPage);
     }
   };
 
@@ -175,69 +353,72 @@ const ManagersPage = () => {
           <h2 className="text-2xl font-bold text-blue-800 mb-6">Managers</h2>
           {loading ? (
             <Spinner />
+          ) : managers.length === 0 ? (
+            <div className="text-gray-600 text-center">
+              No managers found. Try refreshing or check the API.
+            </div>
           ) : (
-            <table className="w-full bg-white shadow-md rounded-xl overflow-hidden">
-              <thead className="bg-blue-100 text-blue-800">
-                <tr>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Validated</th>
-                  <th>Blocked</th>
-                  <th>Restaurants</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {managers.map((mgr) => (
-                  <tr key={mgr._id} className="border-t">
-                    <td className="px-4 py-3">{mgr.name}</td>
-                    <td className="px-4 py-3">{mgr.email}</td>
-                    <td className="px-4 py-3">
-                      {mgr.isValidated ? "Yes" : "No"}
-                    </td>
-                    <td className="px-4 py-3">
-                      {mgr.isBlocked ? "Yes" : "No"}
-                    </td>
-                    <td className="px-4 py-3">
-                      {mgr.restaurants?.length || 0}
-                    </td>
-                    <td className="px-4 py-3 flex gap-2">
-                      <button
-                        onClick={() => handleValidateToggle(mgr)}
-                        className={`px-3 py-1 rounded-md font-semibold ${
-                          mgr.isValidated
-                            ? "bg-yellow-500 hover:bg-yellow-600"
-                            : "bg-green-500 hover:bg-green-600"
-                        } text-white`}
-                      >
-                        {mgr.isValidated ? "Invalidate" : "Validate"}
-                      </button>
-
-                      <button
-                        onClick={() => handleBlockToggle(mgr)}
-                        className={`px-3 py-1 rounded-md font-semibold ${
-                          mgr.isBlocked
-                            ? "bg-green-500 hover:bg-green-600"
-                            : "bg-red-500 hover:bg-red-600"
-                        } text-white`}
-                      >
-                        {mgr.isBlocked ? "Unblock" : "Block"}
-                      </button>
-
-                      <button
-                        onClick={() => handleDelete(mgr)}
-                        className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md font-semibold"
-                      >
-                        Delete
-                      </button>
-                    </td>
+            <>
+              <table className="w-full bg-white shadow-md rounded-xl overflow-hidden">
+                <thead className="bg-blue-100 text-blue-800">
+                  <tr>
+                    <th className="px-4 py-2">Email</th>
+                    <th className="px-4 py-2">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {managers.map((mgr) => (
+                    <tr key={mgr._id} className="border-t">
+                      <td className="px-4 py-3">{mgr.email}</td>
+                      <td className="px-4 py-3 flex gap-2">
+                        <button
+                          onClick={() => handleValidate(mgr)}
+                          className="px-3 py-1 rounded-md font-semibold bg-green-500 hover:bg-green-600 text-white"
+                        >
+                          Validate
+                        </button>
+                        <button
+                          onClick={() => handleInvalidate(mgr)}
+                          className="px-3 py-1 rounded-md font-semibold bg-yellow-500 hover:bg-yellow-600 text-white"
+                        >
+                          Invalidate
+                        </button>
+                        <button
+                          onClick={() => handleBlock(mgr)}
+                          className="px-3 py-1 rounded-md font-semibold bg-red-500 hover:bg-red-600 text-white"
+                        >
+                          Block
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {/* Pagination Controls */}
+              <div className="flex justify-between items-center mt-4">
+                <button
+                  onClick={() => handlePageChange(page - 1)}
+                  disabled={page === 1}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-md disabled:bg-gray-300"
+                >
+                  Previous
+                </button>
+                <span>
+                  Page {currentPage} of {totalPages}
+                </span>
+                <button
+                  onClick={() => handlePageChange(page + 1)}
+                  disabled={page === totalPages}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-md disabled:bg-gray-300"
+                >
+                  Next
+                </button>
+              </div>
+            </>
           )}
         </main>
       </div>
+      <AdminChart />
     </div>
   );
 };
