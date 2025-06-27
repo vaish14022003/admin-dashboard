@@ -1,36 +1,4 @@
-// // src/pages/ManagersChart.tsx
-// import React from 'react';
-// import {
-//     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
-// } from 'recharts';
 
-// const managerData = [
-//     { restaurant: 'KFC', performance: 85 },
-//     { restaurant: 'Dominos', performance: 75 },
-//     { restaurant: 'Burger King', performance: 90 },
-//     { restaurant: 'Pizza Hut', performance: 60 },
-//     { restaurant: 'Subway', performance: 78 },
-// ];
-
-// const ManagersChart = () => {
-//     return (
-//         <div className="bg-gray-800 p-6 rounded-xl shadow-md mt-10">
-//             <h3 className="text-xl font-semibold text-white mb-4">Manager Performance by Restaurant</h3>
-//             <ResponsiveContainer width="100%" height={300}>
-//                 <BarChart data={managerData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-//                     <CartesianGrid strokeDasharray="3 3" stroke="#444" />
-//                     <XAxis dataKey="restaurant" stroke="#ccc" />
-//                     <YAxis stroke="#ccc" />
-//                     <Tooltip />
-//                     <Legend />
-//                     <Bar dataKey="performance" fill="#10b981" />
-//                 </BarChart>
-//             </ResponsiveContainer>
-//         </div>
-//     );
-// };
-
-// export default ManagersChart;
 import React from 'react';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell

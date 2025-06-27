@@ -1,45 +1,4 @@
 
-// import { useDispatch } from 'react-redux';
-// import { logout } from '../features/auth/authSlice';
-// import { useNavigate } from 'react-router-dom';
-// import Notifications from './Notifications';
-
-
-// const Header = () => {
-//     const dispatch = useDispatch();
-//     const navigate = useNavigate();
-
-//     const handleLogout = () => {
-//         dispatch(logout());
-//         navigate('/login');
-       
-       
-
-
-//     };
-
-//     return (
-//         <div className="flex justify-between items-center px-6 py-4 bg-white shadow-md ml-64">
-//             <h1 className="text-2xl font-bold text-blue-800">Admin Panel</h1>
-           
-
-//             <div className="flex items-center gap-4">
-//                 <Notifications />
-//                 {/* <button onClick={handleLogout}>Logout</button> */}
-//                 <button
-//                     onClick={handleLogout}
-//                     className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md"
-//                 >
-//                     Logout
-//                 </button>
-//             </div>
-
-//         </div>
-        
-//     );
-// };
-
-// export default Header;
 import { useDispatch } from 'react-redux';
 import { logout } from '../features/auth/authSlice';
 import { useNavigate } from 'react-router-dom';

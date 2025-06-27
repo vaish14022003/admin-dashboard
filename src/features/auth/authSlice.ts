@@ -17,21 +17,7 @@ const initialState: AuthState = {
     error: null,
 };
 
-// export const loginAdmin = createAsyncThunk(
-//     'auth/loginAdmin',
-//     async (credentials: { email: string; password: string }, thunkAPI) => {
-//         try {
-//             const response = await axios.post('http://localhost:3000/auth/login', credentials);
-//             const token = response.data?.token;
-//             if (token) {
-//                 localStorage.setItem('admin_token', token);
-//             }
-//             return token;
-//         } catch (error: any) {
-//             return thunkAPI.rejectWithValue(error.response.data.message);
-//         }
-//     }
-// );
+
 export const loginAdmin = createAsyncThunk(
     'auth/loginAdmin',
     async (credentials: { email: string; password: string }, thunkAPI) => {
