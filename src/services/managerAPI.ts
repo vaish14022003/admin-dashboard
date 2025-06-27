@@ -72,5 +72,8 @@ export const invalidateManager = async (managerId: string, restaurantId: string)
 export const blockManager = async (managerId: string, restaurantId: string) =>
   await api.patch(`/manager/Block?managerId=${managerId}&restaurantId=${restaurantId}`);
 
+export const deleteManager = async (managerId: string) =>
+  await api.delete(`/manager/${managerId}`);
+
 
 

@@ -17,11 +17,13 @@ import {
 } from "recharts";
 import styles from "./charts.module.css";
 
-export default function AdminChart() {
+export default function AdminChart(totalNotBlockedCount) {
+  //states management
   const [lineData, setLineData] = useState([]);
   const [areaData, setAreaData] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  //dummy api
   useEffect(() => {
     fetch("https://jsonplaceholder.typicode.com/posts?_limit=4")
       .then((response) => response.json())
