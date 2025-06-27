@@ -17,31 +17,42 @@ const initialState: AuthState = {
     error: null,
 };
 
+// export const loginAdmin = createAsyncThunk(
+//     'auth/loginAdmin',
+//     async (credentials: { email: string; password: string }, thunkAPI) => {
+//         try {
+//             const response = await axios.post('http://localhost:3000/auth/login', credentials);
+//             const token = response.data?.token;
+//             if (token) {
+//                 localStorage.setItem('admin_token', token);
+//             }
+//             return token;
+//         } catch (error: any) {
+//             return thunkAPI.rejectWithValue(error.response.data.message);
+//         }
+//     }
+// );
 export const loginAdmin = createAsyncThunk(
     'auth/loginAdmin',
     async (credentials: { email: string; password: string }, thunkAPI) => {
         try {
             const response = await axios.post('http://localhost:3000/auth/login', credentials);
-            const token = response.data?.token;
-            if (token) {
+            const { token, adminId } = response.data;
+
+            if (token && adminId) {
                 localStorage.setItem('admin_token', token);
+                localStorage.setItem('adminId', adminId);
             }
-            return token;
+
+            return { token, adminId };
         } catch (error: any) {
             return thunkAPI.rejectWithValue(error.response.data.message);
         }
     }
 );
 
-// export const logout = createAsyncThunk('auth/logout', async (_, thunkAPI) => {
-//     try {
-//         const res = await logoutAdmin();
-//         localStorage.removeItem('loginToken');
-//         return res;
-//     } catch (err: any) {
-//         return thunkAPI.rejectWithValue(err.response?.data?.message || 'Logout failed');
-//     }
-// });
+
+
 
 const authSlice = createSlice({
     name: 'auth',
@@ -51,9 +62,7 @@ const authSlice = createSlice({
             state.token = null;
             localStorage.removeItem('admin_token');
         },
-        // loginSuccess: (state, action) => {
-        //     state.token = action.payload;
-        //   },
+        
         loginSuccess: (state, action: PayloadAction<string>) => {
             state.token = action.payload;
         }
@@ -66,18 +75,21 @@ const authSlice = createSlice({
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(loginAdmin.fulfilled, (state, action: PayloadAction<string>) => {
-                state.token = action.payload;
+            // .addCase(loginAdmin.fulfilled, (state, action: PayloadAction<string>) => {
+            //     state.token = action.payload;
+            //     state.loading = false;
+            // })
+            .addCase(loginAdmin.fulfilled, (state, action: PayloadAction<{ token: string; adminId: string }>) => {
+                state.token = action.payload.token;
+                state.user.adminId = action.payload.adminId;
                 state.loading = false;
             })
+            
             .addCase(loginAdmin.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string;
             })
-            // .addCase(logout.fulfilled, (state) => {
-            //     state.user = null;
-            //     state.token = null;
-            // })
+            
     
     },
 });

@@ -8,7 +8,9 @@ export const loginAdmin = async (email: string, password: string) => {
 };
 
 export const forgotPassword = async (email: string) => {
-    const response = await api.post('/auth/forgot-password', { email });
+    const response = await api.post('/auth/forgot-password', { email },{
+        
+    });
     return response.data;
 };
 
@@ -27,7 +29,15 @@ export const resetPassword = async (token: string, password: string) => {
     const response = await api.post(`/auth/reset-password/${token}`, { password });
     return response.data;
 };
-export const logoutAdmin = async () => {
-    const response = await api.post('/auth/admin/logout');
+// export const logoutAdmin = async () => {
+//     const response = await api.post('/auth/admin/logout');
+//     return response.data;
+// };
+export const logoutAdmin = async (adminId: string) => {
+    const response = await api.post('/auth/admin/logout', { adminId },{
+        headers: {
+            Authorization: `Bearer: ${localStorage.getItem('adminId')}`
+        }
+    });
     return response.data;
 };
